@@ -105,6 +105,13 @@ def bestMove(board):
           bestVal = moveVal; 
   return [row,col]
 
+def isInt(v):
+    try:
+    	i = int(v)
+    except:
+    	return False
+    return True
+
 def game():
     turn = 'X'
     count = 0
@@ -121,7 +128,18 @@ def game():
           c=move[1]
         else:
           print("It's your turn," + turn)
-          move = int(input())-1        
+          move = input()
+
+          if (not isInt(move)):
+          	print("Wrong choice")
+          	sleep(1)
+          	continue
+          move=int(move)-1
+          if(move>8 or move<0):
+          	print("Wrong choice")
+          	sleep(1)
+          	continue
+
           r=int(move/3)
           c=move%3
         
