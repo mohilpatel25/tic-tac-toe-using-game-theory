@@ -1,200 +1,198 @@
-from os import system
-from time import sleep
+"""Implementation of tic tac toe using game theory.
+"""
 
-board=[[' ',' ',' '],[' ',' ',' '],[' ',' ',' ']]
-
-player="O"
-opponent="X"
-
-def printboard():
-  print(' '+board[0][0] + '|' + board[0][1] + '|' + board[0][2])
-  print(' -+-+-')
-  print(' '+board[1][0] + '|' + board[1][1] + '|' + board[1][2])
-  print(' -+-+-')
-  print(' '+board[2][0] + '|' + board[2][1] + '|' + board[2][2])
-  print()
-
-def instruct():
-  print('Tic-Tac-Toe')
-  print('Inputs')
-  print(' 1|2|3')
-  print(' -+-+-')
-  print(' 4|5|6')
-  print(' -+-+-')
-  print(' 7|8|9')
-  print()
-
-def movesleft(board):
-  for i in range(3): 
-    for j in range(3):
-      if(board[i][j]==' '):
-        return True
-  return False
-
-def evaluate(b):
-    for row in range(3): 
-        if (b[row][0]==b[row][1]==b[row][2]):
-          if (b[row][0]==player):
-            return +10
-          elif (b[row][0]==opponent):
-            return -10
-  
-    for col in range(3):
-        if (b[0][col]==b[1][col]==b[2][col]): 
-          if (b[0][col]==player):
-            return +10 
-          elif (b[0][col]==opponent): 
-            return -10;
-
-    if (b[0][0]==b[1][1]==b[2][2]):
-      if (b[0][0]==player): 
-        return +10
-      elif (b[0][0]==opponent): 
-        return -10 
-  
-    if (b[0][2] == b[1][1]==b[2][0]): 
-      if (b[0][2]==player): 
-        return +10
-      elif (b[0][2]==opponent): 
-            return -10 
-
-    return 0
+import os
 
 
-def minimax(board,depth,isMax):
-  score=evaluate(board);
-  if (score==10):
-    return score 
-  if (score==-10): 
-    return score
-  if (movesleft(board)==False):
-    return 0
-  if (isMax==True): 
-    best = -1000
+class TicTacToe:
+  """Class for tic tac toe game."""
+
+  def __init__(self, player: str = 'O') -> None:
+    self.board = [[' ', ' ', ' '], [' ', ' ', ' '], [' ', ' ', ' ']]
+    self.player = player
+    self.opponent = 'X' if player == 'O' else 'O'
+
+  def clear(self):
+    # for windows
+    if os.name == 'nt':
+      os.system('cls')
+    # for mac and linux
+    else:
+      os.system('clear')
+
+  def printboard(self):
+    print(f'{self.board[0][0]}|{self.board[0][1]}|{self.board[0][2]}')
+    print('-+-+-')
+    print(f'{self.board[1][0]}|{self.board[1][1]}|{self.board[1][2]}')
+    print('-+-+-')
+    print(f'{self.board[2][0]}|{self.board[2][1]}|{self.board[2][2]}')
+    print()
+
+  def instruct(self):
+    print('Tic-Tac-Toe')
+    print('Inputs')
+    print('1|2|3')
+    print('-+-+-')
+    print('4|5|6')
+    print('-+-+-')
+    print('7|8|9')
+    print()
+
+  def movesleft(self):
     for i in range(3):
       for j in range(3):
-        if (board[i][j]==' '): 
-         board[i][j] = player
-         best=max(best, minimax(board,depth + 1, not isMax))
-         board[i][j] = ' '
-    return best
-  else:
-    best = 1000;
+        if self.board[i][j] == ' ':
+          return True
+    return False
+
+  def evaluate(self):
+    for row in range(3):
+      if self.board[row][0] == self.board[row][1] == self.board[row][2]:
+        if self.board[row][0] == self.player:
+          return +10
+        elif self.board[row][0] == self.opponent:
+          return -10
+
+    for col in range(3):
+      if self.board[0][col] == self.board[1][col] == self.board[2][col]:
+        if self.board[0][col] == self.player:
+          return +10
+        elif self.board[0][col] == self.opponent:
+          return -10
+
+    if self.board[0][0] == self.board[1][1] == self.board[2][2]:
+      if self.board[0][0] == self.player:
+        return +10
+      elif self.board[0][0] == self.opponent:
+        return -10
+
+    if self.board[0][2] == self.board[1][1] == self.board[2][0]:
+      if self.board[0][2] == self.player:
+        return +10
+      elif self.board[0][2] == self.opponent:
+        return -10
+
+    return 0
+
+  def minimax(self, depth, is_max):
+    score = self.evaluate()
+    if score == 10:
+      return score
+    if score == -10:
+      return score
+    if not self.movesleft():
+      return 0
+    if is_max:
+      best = -1000
+      for i in range(3):
+        for j in range(3):
+          if self.board[i][j] == ' ':
+            self.board[i][j] = self.player
+            best = max(best, self.minimax(depth + 1, not is_max))
+            self.board[i][j] = ' '
+      return best
+    else:
+      best = 1000
+      for i in range(3):
+        for j in range(3):
+          if self.board[i][j] == ' ':
+            self.board[i][j] = self.opponent
+            best = min(best, self.minimax(depth + 1, not is_max))
+            self.board[i][j] = ' '
+      return best
+
+  def best_move(self):
+    best_val = -1000
+    row = -1
+    col = -1
     for i in range(3):
-      for j in range(3): 
-        if (board[i][j]==' '):
-          board[i][j]=opponent 
-          best =min(best, minimax(board,depth + 1, not isMax))
-          board[i][j]=' ' 
-    return best
+      for j in range(3):
+        if self.board[i][j] == ' ':
+          self.board[i][j] = self.player
+          move_val = self.minimax(0, False)
+          self.board[i][j] = ' '
+          if move_val > best_val:
+            row = i
+            col = j
+            best_val = move_val
+    return [row, col]
 
-
-def bestMove(board): 
-  bestVal = -1000; 
-  row = -1; 
-  col = -1; 
-  for i in range(3):
-    for j in range(3):
-      if (board[i][j]==' '):
-        board[i][j] = player
-        moveVal=minimax(board, 0, False)
-        board[i][j]=' ' 
-        if (moveVal > bestVal): 
-          row=i
-          col=j
-          bestVal = moveVal; 
-  return [row,col]
-
-def isInt(v):
+  def is_int(self, v: str) -> bool:
     try:
-    	i = int(v)
-    except:
-    	return False
+      int(v)
+    except ValueError:
+      return False
     return True
 
-def game():
-    turn = 'X'
+  def play(self) -> None:
+    turn = self.opponent
     count = 0
-    for i in range(10): 
-        system('cls')
-        instruct()
-        printboard()
-        move=''
-        r=-1
-        c=-1
-        if(turn=='O'):
-          move=bestMove(board)
-          r=move[0]
-          c=move[1]
-        else:
-          print("It's your turn," + turn)
-          move = input()
+    for _ in range(10):
+      self.clear()
+      self.instruct()
+      self.printboard()
+      move = ''
+      r = -1
+      c = -1
+      if turn == self.player:
+        r, c = self.best_move()
+      else:
+        print('It\'s your turn, ' + turn)
+        move = input()
 
-          if (not isInt(move)):
-          	print("Wrong choice")
-          	sleep(1)
-          	continue
-          move=int(move)-1
-          if(move>8 or move<0):
-          	print("Wrong choice")
-          	sleep(1)
-          	continue
+        if not self.is_int(move):
+          print('Wrong choice')
+          continue
+        move = int(move) - 1
+        if move > 8 or move < 0:
+          print('Wrong choice')
+          continue
 
-          r=int(move/3)
-          c=move%3
-        
-        if board[r][c] == ' ':
-            board[r][c] = turn
-            count += 1
-        else:
-            print("Already filled")
-            sleep(1)
-            continue
+        r = int(move / 3)
+        c = move % 3
 
-        win=''
-        if count >= 5:
-          for row in range(3): 
-            if (board[row][0]==board[row][1]==board[row][2]):
-              if (board[row][0]==player):
-                win='O'
-              elif (board[row][0]==opponent):
-                win='X'
-          for col in range(3):
-            if (board[0][col]==board[1][col]==board[2][col]): 
-              if (board[0][col]==player):
-                win='O' 
-              elif (board[0][col]==opponent): 
-                win='X'
-          if (board[0][0]==board[1][1]==board[2][2]):
-            if (board[0][0]==player): 
-              win='O'
-            elif (board[0][0]==opponent): 
-              win='X' 
-         
-          if (board[0][2] == board[1][1]==board[2][0]): 
-            if (board[0][2]==player): 
-              win='O'
-            elif (board[0][2]==opponent): 
-              win='X'
-        
-        if (win=='O'):
-          printboard()
-          print("O won")
-          break
-        elif win=='X':
-          printboard() 
-          print("X won")
-          break
+      if self.board[r][c] == ' ':
+        self.board[r][c] = turn
+        count += 1
+      else:
+        print('Already filled')
+        continue
 
-        if count == 9:
-          printboard()
-          print("\nGame Over")                
-          print("Draw!!")
-          break
+      win = ''
+      if count >= 5:
+        for row in range(3):
+          if self.board[row][0] == self.board[row][1] == self.board[row][2]:
+            win = self.board[row][0]
+        for col in range(3):
+          if self.board[0][col] == self.board[1][col] == self.board[2][col]:
+            win = self.board[0][col]
+        if self.board[0][0] == self.board[1][1] == self.board[2][2]:
+          win = self.board[0][0]
 
-        if turn =='X':
-            turn = 'O'
-        else:
-            turn = 'X'
+        if self.board[0][2] == self.board[1][1] == self.board[2][0]:
+          win = self.board[0][2]
 
-game()
+      if win == 'O':
+        self.printboard()
+        print('O won')
+        break
+      elif win == 'X':
+        self.printboard()
+        print('X won')
+        break
+
+      if count == 9:
+        self.printboard()
+        print('\nGame Over')
+        print('Draw!!')
+        break
+
+      if turn == self.player:
+        turn = self.opponent
+      else:
+        turn = self.player
+
+
+if __name__ == '__main__':
+  game = TicTacToe()
+  game.play()
